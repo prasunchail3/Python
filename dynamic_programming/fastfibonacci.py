@@ -2,42 +2,44 @@
 This program calculates the nth Fibonacci number in O(log(n)).
 It's possible to calculate F(1000000) in less than a second.
 """
-from __future__ import print_function
-import sys
-
-
-# returns F(n)
-def fibonacci(n: int):  # noqa: E999 This syntax is Python 3 only
-    if n < 0:
-        raise ValueError("Negative arguments are not supported")
-    return _fib(n)[0]
-
-
-# returns (F(n), F(n-1))
-def _fib(n: int):  # noqa: E999 This syntax is Python 3 only
-    if n == 0:
-        # (F(0), F(1))
-        return (0, 1)
+#------------------------------------Actual Computation---------------------#
+def fastExpo(n):
+    if n == 1:
+      return [[1, 1], [1, 0]]  
+    matrix = fastExpo(n//2)
+    matrix1 = [[0, 0], [0, 0]]
+    matrix1[0][0] = matrix[0][0] ** 2 + (matrix[0][1] * matrix[1][0])
+    matrix1[1][1] = matrix[1][1] ** 2 + (matrix[0][1] * matrix[1][0])
+    matrix1[0][1] = matrix[0][1] * (matrix[0][0] + matrix[1][1])
+    matrix1[1][0] = matrix[1][0] * (matrix[0][0] + matrix[1][1])
+    if n % 2 == 0:
+        return matrix1[:]
     else:
-        # F(2n) = F(n)[2F(n+1) − F(n)]
-        # F(2n+1) = F(n+1)^2+F(n)^2
-        a, b = _fib(n // 2)
-        c = a * (b * 2 - a)
-        d = a * a + b * b
-        if n % 2 == 0:
-            return (c, d)
-        else:
-            return (d, c + d)
+        matrix2 = [[0, 0], [0, 0]]
+        matrix2[0][0] = matrix1[0][0] + matrix1[1][0]
+        matrix2[1][1] = matrix1[0][1]
+        matrix2[0][1] = matrix1[0][1] + matrix1[1][1]
+        matrix2[1][0] = matrix1[0][0]
+        return matrix2[:]
 
+"""
+Assuming the 0th element to be 0, 1st element to be 1, 2nd to be 1 and so on
+"""
+def fibonacci(n):
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fastExpo(n)[1][0]
 
-if __name__ == "__main__":
-    args = sys.argv[1:]
-    if len(args) != 1:
-        print("Too few or too much parameters given.")
-        exit(1)
-    try:
-        n = int(args[0])
-    except ValueError:
-        print("Could not convert data to an integer.")
-        exit(1)
-    print("F(%d) = %d" % (n, fibonacci(n)))
+#---------------------------------------------------------------------------#
+#--------------------------------Input Statements---------------------------#
+print('Enter the value of n : ')
+n = int(input())
+n -= 1
+if n < 0:
+    print('Invvalid input')
+else:
+    print('The fibonacci number at position ', n+1, ' is : ', fibonacci(n))
+#---------------------------------------------------------------------------#
